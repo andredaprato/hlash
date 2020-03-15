@@ -8,14 +8,14 @@ import           Network.Wai.Handler.Warp (run)
 import           System.Remote.Monitoring (forkServerWith)
 
 import qualified Data.HashMap.Strict as HashMap
-import           Lib.App (AppEnv, Env(..), RoomState(..))
-import           Lib.Config
-import           Lib.Core.Lobby
-import           Lib.Core.Types
-import           Lib.Db
-import           Lib.Db.Functions (initialisePool)
-import           Lib.Db.Settings
-import           Lib.Server (application)
+import           Hlash.App (AppEnv, Env(..), RoomState(..))
+import           Hlash.Config
+import           Hlash.Core.Lobby
+import           Hlash.Core.Types
+import           Hlash.Db
+import           Hlash.Db.Functions (initialisePool)
+import           Hlash.Db.Settings
+import           Hlash.Server (application)
 import           Servant.Auth.Server (generateKey, writeKey, readKey, defaultJWTSettings, defaultCookieSettings, CookieSettings(..), SameSite(..), IsSecure(..))
 import qualified System.Metrics as Metrics
 import           System.Posix.Files (fileExist)
@@ -32,11 +32,11 @@ mkAppEnv Config{..} = do
     clients <- newTVarIO HashMap.empty
     let envRoomState =  RoomState {lobbyStore , gameStore,  clients}
 
-    secretFile <- fileExist ".jwtSecret"
+    secretFile <- fileExist "./.jwtSecret"
     envJWTSecret <- if secretFile
-                    then readKey ".jwtSecret"
+                    then readKey "./.jwtSecret"
                     else do key <-  generateKey
-                            writeKey "../.jwtSecret"
+                            writeKey "./.jwtSecret"
                             pure key
 
 

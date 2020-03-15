@@ -1,0 +1,54 @@
+let mkPackage =
+	  https://raw.githubusercontent.com/purescript/package-sets/psc-0.13.0/src/mkPackage.dhall
+
+let upstream =
+	  https://raw.githubusercontent.com/purescript/package-sets/psc-0.13.2-20190725/src/packages.dhall sha256:60cc03d2c3a99a0e5eeebb16a22aac219fa76fe6a1686e8c2bd7a11872527ea3
+
+let additions =
+	  { halogen-formless =
+		  mkPackage
+		  [ "halogen"
+		  , "halogen-renderless"
+		  , "variant"
+		  , "heterogeneous"
+		  , "generics-rep"
+		  , "profunctor-lenses"
+		  ]
+		  "https://github.com/thomashoneyman/purescript-halogen-formless.git"
+		  "v1.0.0-rc.1"
+	  , halogen-renderless =
+		  mkPackage
+		  [ "prelude", "control" ]
+		  "https://github.com/thomashoneyman/purescript-halogen-renderless"
+		  "master"
+	  }
+
+let overrides =
+	  { halogen =
+		  upstream.halogen ⫽ { version = "master" }
+	  , halogen-vdom =
+		  upstream.halogen-vdom ⫽ { version = "v6.1.0" }
+	  }
+
+{-
+Welcome to a Spago project!
+You can edit this file as you like.
+-}
+{ sources =
+    [ "src/**/*.purs", "test/**/*.purs" ]
+, name =
+    "my-project"
+, dependencies =
+    [ "effect"
+    , "console"
+    , "psci-support"
+    , "halogen"
+    , "affjax"
+    , "routing"
+    , "newtype"
+    , "halogen-vdom"
+    , "halogen-formless"
+    ]
+, packages =
+    ./packages.dhall
+}

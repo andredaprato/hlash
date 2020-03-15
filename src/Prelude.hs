@@ -23,7 +23,6 @@ import Servant.API.Generic as Web ((:-), toServant)
 import Servant.API as Web ((:>), Capture, Get, Header, Header', JSON, NoContent (NoContent), Post,
                            QueryParam, QueryParam', ReqBody)
 
-import Web.HttpApiData as Web (FromHttpApiData (..), ToHttpApiData (..))
 import Data.ByteString.Lazy as B
 
 encodeWithTags :: (Generic a, GToJSON Zero (Rep a)) => a -> B.ByteString

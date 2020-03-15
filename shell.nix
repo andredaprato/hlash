@@ -5,7 +5,7 @@ let
 in 
 pkgs.lib.fix (self: hsPkgs.shellFor {
   packages = ps: with ps; [
-    simple-ide-test
+    hlash
   ];
 
   withHoogle = true;
