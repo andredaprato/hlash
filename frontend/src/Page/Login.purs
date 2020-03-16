@@ -50,11 +50,10 @@ component ::  forall m .
 component  = H.mkComponent { initialState : initialState
                            , render
                            , eval : H.mkEval $ H.defaultEval { handleAction = handleAction
-                                                             -- , initialize = Just Initialize
                                                              }
                            }
   where
-    initialState = const { redirect : false}
+    initialState = const { }
     
     render st =
       HH.div [css "section"]
@@ -72,7 +71,8 @@ component  = H.mkComponent { initialState : initialState
         a <- loginUser login
         case a of
           Nothing -> void $ H.query F._formless unit $ F.injQuery $ CredError true unit 
-          Just _ -> H.raise unit *> navigate Home
+          Just _ -> do H.raise unit
+                       navigate Home
       SignUp -> navigate Register
 
 

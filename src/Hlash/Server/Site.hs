@@ -26,19 +26,20 @@ import Servant.API.Generic (ToServantApi, ToServant,  toServant, genericApi, fro
 import Servant.Auth.Server (Auth, AuthResult(..), Cookie, JWT, CookieSettings, JWTSettings, throwAll)
 import Servant.Server.Generic (genericServer)
 
+type SiteApi = ToServantApi Site
+
 type SiteAuths = Auth '[Cookie]
 data Site route = Site
   {
-    protectedSite :: route :- SiteAuths UserId :> ToServantApi ProtectedSite 
-  , unprotectedSite :: route :- ToServantApi UnprotectedSite 
+    protectedSite :: route :- "api" :> "v1" :> SiteAuths UserId :> ToServantApi ProtectedSite 
+  , unprotectedSite :: route :- "api" :> "v1" :> ToServantApi UnprotectedSite 
+  , assets :: route :- Raw
   } deriving (Generic)
 
-type SiteApi = ToServantApi Site 
 
 data UnprotectedSite route = UnprotectedSite
   {
     authSite :: route :- ToServantApi AuthSite 
-  -- , client :: route :- Raw
   } deriving (Generic)
 
 data ProtectedSite route = ProtectedSite
@@ -51,21 +52,20 @@ data ProtectedSite route = ProtectedSite
 -- TODO: figure out how to handle the auth result better than this
 protectedServer ::  AuthResult UserId -> ProtectedSite AppServer
 protectedServer  res =  ProtectedSite
-  {
-    protectedAuthSite =  toServant $ protectedAuthServer res
+  { protectedAuthSite =  toServant $ protectedAuthServer res
   , questionRoute = toServant $ questionServer  res
   , socketSite = toServant $ socketServer  res
   }
 
 unprotectedServer :: CookieSettings -> JWTSettings -> UnprotectedSite AppServer
 unprotectedServer cs jwts =  UnprotectedSite
-                              {
-                                authSite = toServant $ unprotectedAuthServer cs jwts
-                             -- , client = serveDirectoryFileServer "assets"
+                             { authSite = toServant $ unprotectedAuthServer cs jwts
                              }
   
 siteServer :: CookieSettings -> JWTSettings -> Site AppServer 
 siteServer cs jwts =
   Site { protectedSite =  toServant . protectedServer
        , unprotectedSite = toServant $ unprotectedServer cs jwts
+       , assets = serveDirectoryFileServer "assets"
        }
+

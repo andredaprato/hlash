@@ -28,7 +28,7 @@ type Api = SiteApi
 server :: AppEnv -> Server Api 
 server env =
   hoistServerWithContext
-    (Proxy @Api )
+    (Proxy @Api)
     (Proxy @'[JWTSettings, CookieSettings])
     (runAppAsHandler env)
     (toServant $ siteServer (envCookieSettings env) (envJWTSettings env))
@@ -38,23 +38,24 @@ application env =
   let jwtCfg = envJWTSettings env
       cfg = envCookieSettings env :. jwtCfg :. EmptyContext
   in
-  corsified $ serveWithContext (Proxy @Api ) cfg (server env)
+  -- corsified $ serveWithContext (Proxy @Api) cfg (server env)
+  simpleCors $ serveWithContext (Proxy @Api) cfg (server env)
 
 
-corsified :: Wai.Middleware
-corsified = cors (const $ Just appCorsResourcePolicy)
+-- corsified :: Wai.Middleware
+-- corsified = cors (const $ Just appCorsResourcePolicy)
 
-combineMiddleware :: Wai.Middleware -> IO Wai.Middleware -> IO Wai.Middleware
-combineMiddleware a = fmap (. a)
+-- combineMiddleware :: Wai.Middleware -> IO Wai.Middleware -> IO Wai.Middleware
+-- combineMiddleware a = fmap (. a)
 
-appCorsResourcePolicy :: CorsResourcePolicy
-appCorsResourcePolicy = CorsResourcePolicy {
-    corsOrigins        = Just (["http://localhost:1234"], True)
-  , corsMethods        = ["OPTIONS", "GET", "PUT", "POST", "PATCH", "DELETE"]
-  , corsRequestHeaders = ["Content-Type", "Cookie"]
-  , corsExposedHeaders = Nothing
-  , corsMaxAge         = Nothing
-  , corsVaryOrigin     = False
-  , corsRequireOrigin  = False
-  , corsIgnoreFailures = False
-}
+-- appCorsResourcePolicy :: CorsResourcePolicy
+-- appCorsResourcePolicy = CorsResourcePolicy {
+--     corsOrigins        = Just (["http://localhost:1234"], True)
+--   , corsMethods        = ["OPTIONS", "GET", "PUT", "POST", "PATCH", "DELETE"]
+--   , corsRequestHeaders = ["Content-Type", "Cookie"]
+--   , corsExposedHeaders = Nothing
+--   , corsMaxAge         = Nothing
+--   , corsVaryOrigin     = False
+--   , corsRequireOrigin  = False
+--   , corsIgnoreFailures = False
+-- }

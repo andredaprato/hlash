@@ -40,8 +40,8 @@ main :: Effect Unit
 main = HA.runHalogenAff $ do
   body <- HA.awaitBody
   
-  let baseUrl = BaseURL "http://localhost:8000"
-      wsUrl   = URL "ws://localhost:8000/stream"
+  let baseUrl = BaseURL "http://localhost:8000/api/v1"
+      wsUrl   = URL "ws://localhost:8000/api/v1/stream"
       logLevel = Dev
 
 
@@ -55,7 +55,6 @@ main = HA.runHalogenAff $ do
   let u = decodeJson =<< bimap printError _.body res 
   liftEffect $ Ref.write (hush u) currentUser
 
---- TODO:  try to establish wsConn with our current cookies
   wsConn <- liftEffect $ Ref.new (Nothing)
 
   let environment :: Env
@@ -68,9 +67,6 @@ main = HA.runHalogenAff $ do
       rootComponent = H.hoist (runAppM environment)  Router.component
   
   driver <- runUI rootComponent {} body
-  -- setup <- setupSocket driver wsUrl
-
-  -- liftEffect $ (Ref.write  (Just setup)  wsConn)
 
   void $ liftEffect $ matchesWith (parse router) \old new ->
     when (old /= Just new) do
